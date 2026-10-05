@@ -13,14 +13,14 @@ Envie as duas planilhas (.xlsx/.xls/.csv) e baixe o relatório. Tudo roda local.
 `config.json`: similaridade mínima (85) e de revisão (70), tolerância de valor (R$ 0,01), dias máx. emissão→entrada (30), tabela Espécie→Modelo, palavras de evento (CANCEL, DENEG), sufixos de empresa ignorados. Os 4 números também podem ser alterados na tela.
 
 ## Abas do relatório
-Resumo · Divergências (só notas com divergência, com critério e % de similaridade) · Canceladas escrituradas · Revisão manual · Só no Domínio · Só no Automais · Chaves inválidas.
+Resumo · Não constam no Domínio · Não constam no Automais · Conferência manual (divergências, linha inteira das duas planilhas) · Canceladas escrituradas · Chaves inválidas.
 
 ## Decisões
 - Domínio: cabeçalho localizado automaticamente; as duas colunas "Código" por posição (1ª = lançamento, 2ª = fornecedor); linhas sem nota/fornecedor/data (totais, quebras) ignoradas; várias linhas da mesma nota somam o Valor Contábil.
 - Chave NF: precisa de 44 posições; CNPJ mantém letras (alfanumérico); UF por tabela IBGE.
-- Similaridade: `token_sort_ratio` (fuzzball, equivalente ao rapidfuzz), configurável em `metodoSimilaridade`.
+- Similaridade de nomes: `token_sort_ratio` (fuzzball) ou nome contido no outro / abreviações (ignorando palavras genéricas). Só entram espécies de `especiesConferidas` (36 = NF-e).
 - Série vazia em um lado: cruza por Número + Fornecedor e sinaliza.
-- Mais de um candidato: desempate pelo valor; empate persistente vai para Revisão manual.
+- Mais de um candidato: desempate pelo valor; empate persistente vai para Conferência manual.
 
 ## Hospedar em servidor
 Requer Node.js 18+.
