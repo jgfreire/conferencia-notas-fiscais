@@ -1,0 +1,4 @@
+node_modules/
+test/saida_teste.xlsx
+*.log
+.env

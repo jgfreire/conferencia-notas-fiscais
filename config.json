@@ -1,0 +1,32 @@
+{
+  "similaridadeMinima": 85,
+  "similaridadeRevisao": 70,
+  "metodoSimilaridade": "token_sort_ratio",
+  "toleranciaValor": 0.01,
+  "diasMaximosEntreEmissaoEEntrada": 30,
+  "equivalenciaEspecieModelo": {
+    "36": "55",
+    "55": "55",
+    "65": "65",
+    "NFE": "55",
+    "NF": "55",
+    "NFEL": "55",
+    "NFCE": "65",
+    "NFC": "65"
+  },
+  "palavrasEventoCancelamento": [
+    "CANCEL",
+    "DENEG"
+  ],
+  "sufixosEmpresa": [
+    "LTDA",
+    "ME",
+    "EPP",
+    "EIRELI",
+    "SA",
+    "MEI"
+  ],
+  "especiesConferidas": [
+    "36"
+  ]
+}

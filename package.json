@@ -1,0 +1,17 @@
+{
+  "name": "conferencia-notas-fiscais",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cruzamento Livro de Entradas (Dominio) x Automais",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/run.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "fuzzball": "^2.2.6",
+    "multer": "^2.4.0",
+    "xlsx": "^0.18.5"
+  }
+}

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conferência de Notas Fiscais</title>
+<style>
+  :root { --bg:#f4f6f9; --card:#fff; --ink:#1c2733; --muted:#5b6b7b; --line:#d9e0e8; --brand:#1f4e78; --bad:#b42318; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14191f; --card:#1d252e; --ink:#e6ecf2; --muted:#9aa9b8; --line:#2d3946; --brand:#5aa0d6; --bad:#f08a80; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui,Segoe UI,sans-serif; }
+  main { max-width:760px; margin:0 auto; padding:24px 16px 48px; }
+  h1 { font-size:22px; margin:0 0 4px; }
+  p.sub { color:var(--muted); margin:0 0 20px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px; margin-bottom:16px; }
+  label { display:block; font-weight:600; margin-bottom:6px; }
+  input[type=file] { width:100%; margin-bottom:14px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+  input[type=number] { width:100%; padding:6px 8px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--ink); }
+  button, a.btn { background:var(--brand); color:#fff; border:0; border-radius:8px; padding:10px 18px; font-size:15px; cursor:pointer; text-decoration:none; display:inline-block; }
+  button:disabled { opacity:.5; cursor:wait; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; }
+  td { padding:6px 4px; border-bottom:1px solid var(--line); }
+  td:last-child { text-align:right; font-variant-numeric:tabular-nums; font-weight:600; }
+  h2 { font-size:16px; margin:0 0 8px; }
+  .ok { color:var(--muted); margin:0; }
+  .rolar { max-height:360px; overflow:auto; }
+  table.lst th { text-align:right; padding:4px; position:sticky; top:0; background:var(--card); }
+  table.lst td { text-align:right; font-weight:400; font-size:14px; }
+  table.lst .l { text-align:left; }
+  .err { color:var(--bad); font-weight:600; }
+  details summary { cursor:pointer; color:var(--muted); margin-bottom:10px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Conferência de Notas Fiscais</h1>
+  <p class="sub">Livro de entradas (Domínio) x notas recebidas (Automais). Processado localmente, nada sai deste computador.</p>
+
+  <form id="f" class="card">
+    <label for="dominio">Planilha do Domínio (livro de entradas)</label>
+    <input type="file" id="dominio" name="dominio" accept=".xlsx,.xls,.csv" required>
+    <label for="automais">Planilha do Automais</label>
+    <input type="file" id="automais" name="automais" accept=".xlsx,.xls,.csv" required>
+    <details>
+      <summary>Parâmetros</summary>
+      <div class="grid">
+        <div><label for="similaridadeMinima">Similaridade mín. (%)</label><input type="number" id="similaridadeMinima" name="similaridadeMinima" min="0" max="100"></div>
+        <div><label for="similaridadeRevisao">Revisão manual a partir de (%)</label><input type="number" id="similaridadeRevisao" name="similaridadeRevisao" min="0" max="100"></div>
+        <div><label for="toleranciaValor">Tolerância de valor (R$)</label><input type="number" id="toleranciaValor" name="toleranciaValor" step="0.01" min="0"></div>
+        <div><label for="diasMaximosEntreEmissaoEEntrada">Máx. dias emissão→entrada</label><input type="number" id="diasMaximosEntreEmissaoEEntrada" name="diasMaximosEntreEmissaoEEntrada" min="0"></div>
+      </div>
+    </details>
+    <button id="go" type="submit">Conferir</button>
+  </form>
+
+  <div id="out"></div>
+</main>
+<script>
+const f = document.getElementById('f'), out = document.getElementById('out'), go = document.getElementById('go');
+fetch('/api/config').then(r => r.json()).then(c => {
+  for (const k of ['similaridadeMinima','similaridadeRevisao','toleranciaValor','diasMaximosEntreEmissaoEEntrada']) f.elements[k].value = c[k];
+});
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const brl = (v) => (v === null || v === undefined ? '' : Number(v).toLocaleString('pt-BR', { style:'currency', currency:'BRL' }));
+function lista(titulo, itens) {
+  if (!itens.length) return `<div class="card"><h2>${titulo}</h2><p class="ok">Nenhuma nota.</p></div>`;
+  const linhas = itens.map((n) => `<tr><td>${esc(n.numero)}</td><td>${esc(n.serie || '-')}</td><td class="l">${esc(n.nome)}</td><td>${esc(n.data)}</td><td>${brl(n.valor)}</td>${n.obs !== undefined ? `<td class="l">${esc(n.obs)}</td>` : ''}</tr>`).join('');
+  return `<div class="card"><h2>${titulo} (${itens.length})</h2><div class="rolar"><table class="lst"><tr><th>Nº</th><th>Série</th><th class="l">Fornecedor</th><th>Data</th><th>Valor</th>${itens.some((n) => n.obs) ? '<th class="l">Conferir</th>' : ''}</tr>${linhas}</table></div></div>`;
+}
+f.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  go.disabled = true; out.innerHTML = '';
+  try {
+    const r = await fetch('/api/conferir', { method:'POST', body:new FormData(f) });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.erro || 'Falha ao processar.');
+    out.innerHTML = lista('Notas que NÃO constam no Domínio', j.faltamNoDominio)
+      + lista('Notas que NÃO constam no Automais', j.faltamNoAutomais)
+      + (j.revisar.length ? lista('Notas que precisam de conferência manual', j.revisar) : '')
+      + `<a class="btn" href="/api/relatorio/${j.id}">Baixar relatório completo (.xlsx)</a>`;
+  } catch (err) {
+    out.innerHTML = '<div class="card err"></div>';
+    out.firstChild.textContent = err.message;
+  } finally { go.disabled = false; }
+});
+</script>
+</body>
+</html>
