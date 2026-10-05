@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Usuários - Conferência de Notas Fiscais</title>
+<style>
+  :root { --bg:#f4f6f9; --card:#fff; --ink:#1c2733; --muted:#5b6b7b; --line:#d9e0e8; --brand:#1f4e78; --bad:#b42318; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14191f; --card:#1d252e; --ink:#e6ecf2; --muted:#9aa9b8; --line:#2d3946; --brand:#5aa0d6; --bad:#f08a80; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui,Segoe UI,sans-serif; }
+  main { max-width:560px; margin:0 auto; padding:24px 16px 48px; }
+  h1 { font-size:22px; margin:0 0 16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px; margin-bottom:16px; }
+  label { display:block; font-weight:600; margin:10px 0 4px; }
+  input { width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--ink); font-size:15px; }
+  button { background:var(--brand); color:#fff; border:0; border-radius:8px; padding:9px 16px; cursor:pointer; font-size:14px; }
+  button.del { background:transparent; color:var(--bad); border:1px solid var(--line); padding:4px 10px; }
+  table { width:100%; border-collapse:collapse; }
+  td { padding:8px 4px; border-bottom:1px solid var(--line); }
+  td:last-child { text-align:right; }
+  .err { color:var(--bad); font-weight:600; min-height:1.4em; margin-top:8px; }
+  a { color:var(--brand); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Usuários</h1>
+  <p><a href="/">&larr; Voltar à conferência</a></p>
+  <form id="f" class="card">
+    <label for="usuario">Novo usuário</label><input id="usuario" required autocomplete="off">
+    <label for="senha">Senha</label><input id="senha" type="password" required autocomplete="new-password">
+    <p style="margin:14px 0 0"><button type="submit">Adicionar</button></p>
+    <div class="err" id="err" role="alert"></div>
+  </form>
+  <div class="card"><table id="lista"></table></div>
+</main>
+<script>
+const err = document.getElementById('err'), lista = document.getElementById('lista'), f = document.getElementById('f');
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+async function carregar() {
+  const us = await (await fetch('/api/usuarios')).json();
+  lista.innerHTML = us.map((u) => `<tr><td>${esc(u.usuario)}${u.admin ? ' <small>(administrador)</small>' : ''}</td><td>${u.admin ? '' : `<button class="del" data-u="${esc(u.usuario)}">Remover</button>`}</td></tr>`).join('');
+}
+lista.addEventListener('click', async (e) => {
+  const u = e.target.dataset.u;
+  if (!u || !confirm(`Remover o usuário "${u}"?`)) return;
+  await fetch('/api/usuarios/' + encodeURIComponent(u), { method: 'DELETE' });
+  carregar();
+});
+f.addEventListener('submit', async (e) => {
+  e.preventDefault(); err.textContent = '';
+  const r = await fetch('/api/usuarios', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ usuario: f.usuario.value, senha: f.senha.value }) });
+  const j = await r.json();
+  if (!r.ok) { err.textContent = j.erro; return; }
+  f.reset(); carregar();
+});
+carregar();
+</script>
+</body>
+</html>

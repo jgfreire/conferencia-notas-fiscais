@@ -30,3 +30,10 @@ npm install
 HOST=0.0.0.0 PORT=3100 npm start      # Windows (PowerShell): $env:HOST='0.0.0.0'; npm start
 ```
 Por padrão escuta só em 127.0.0.1 (apenas a própria máquina). Use `HOST=0.0.0.0` para acessar pela rede. Não há login: mantenha o servidor na rede interna ou atrás de um proxy com autenticação. Os arquivos enviados ficam só em memória, nada é gravado em disco.
+
+## Login
+Todas as telas e a API exigem login. Usuários ficam em `data/usuarios.json` (senhas com hash, fora do git). **Em cada máquina nova**, crie o administrador antes de iniciar:
+```
+node scripts/criar-admin.js "<usuario>" "<senha>" "<chave do administrador>"
+```
+O administrador entra marcando "Sou administrador" e informando a chave; na página **Usuários** ele cria e remove usuários comuns. Sessão de 12 h; 5 erros seguidos bloqueiam o IP por 5 minutos. Atrás de HTTPS (proxy), o cookie passa a ser `Secure` automaticamente.
