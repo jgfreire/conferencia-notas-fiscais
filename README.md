@@ -37,3 +37,13 @@ Todas as telas e a API exigem login. Usuários ficam em `data/usuarios.json` (se
 node scripts/criar-admin.js "<usuario>" "<senha>" "<chave do administrador>"
 ```
 O administrador entra marcando "Sou administrador" e informando a chave; na página **Usuários** ele cria e remove usuários comuns. Sessão de 12 h; 5 erros seguidos bloqueiam o IP por 5 minutos. Atrás de HTTPS (proxy), o cookie passa a ser `Secure` automaticamente.
+
+## PM2 (manter no ar)
+```
+npm install -g pm2
+pm2 start ecosystem.config.js     # porta em env.PORT do arquivo (padrão 3200)
+pm2 save                          # guarda a lista para restaurar
+pm2 status                        # ver estado e reiniciar: pm2 restart conferencia-nf
+pm2 logs conferencia-nf           # ver mensagens/erros
+```
+Para iniciar junto com o Windows, `pm2 startup` não funciona nele: use o pacote `pm2-windows-startup` (`npm i -g pm2-windows-startup`, depois `pm2-startup install`, com `pm2 save` feito antes) ou uma Tarefa Agendada que execute `pm2 resurrect` ao ligar.
