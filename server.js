@@ -88,5 +88,5 @@ app.delete('/api/usuarios/:nome', auth.exigirAdmin, (req, res) => {
 app.use(express.static(PUB, { index: 'index.html' }));
 
 const PORT = process.env.PORT || 3100;
-const HOST = process.env.HOST || '127.0.0.1';
+const HOST = process.env.HOST || '0.0.0.0';
 app.listen(PORT, HOST, () => console.log(`Conferência de Notas Fiscais em http://${HOST}:${PORT}`));
