@@ -5,7 +5,6 @@ const path = require('path');
 const ARQ = path.join(__dirname, '..', 'data', 'usuarios.json');
 const SESSAO_MS = 12 * 60 * 60 * 1000;
 const sessoes = new Map(); // token -> { usuario, admin, expira }
-const falhas = new Map(); // ip -> { n, ate }
 
 const norm = (s) => String(s ?? '').trim().normalize('NFC').toLowerCase();
 
@@ -76,19 +75,6 @@ function encerrarSessao(req, res) {
   res.setHeader('Set-Cookie', 'sid=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0');
 }
 
-// Bloqueio simples contra tentativa em massa: 5 erros seguidos = 5 minutos bloqueado (por IP).
-function bloqueado(ip) {
-  const f = falhas.get(ip);
-  return !!f && f.ate > Date.now();
-}
-function registrarFalha(ip) {
-  const f = falhas.get(ip) || { n: 0, ate: 0 };
-  f.n += 1;
-  if (f.n >= 5) { f.ate = Date.now() + 5 * 60 * 1000; f.n = 0; }
-  falhas.set(ip, f);
-}
-function limparFalhas(ip) { falhas.delete(ip); }
-
 function exigirLogin(req, res, next) {
   const s = sessaoDe(req);
   if (s) { req.sessao = s; return next(); }
@@ -102,5 +88,5 @@ function exigirAdmin(req, res, next) {
 
 module.exports = {
   carregar, salvar, criarUsuario, verificar, sessaoDe, iniciarSessao, encerrarSessao,
-  bloqueado, registrarFalha, limparFalhas, exigirLogin, exigirAdmin, norm
+  exigirLogin, exigirAdmin, norm
 };

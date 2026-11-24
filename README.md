@@ -36,7 +36,7 @@ Todas as telas e a API exigem login. Usuários ficam em `data/usuarios.json` (se
 ```
 node scripts/criar-admin.js "<usuario>" "<senha>" "<chave do administrador>"
 ```
-O administrador entra marcando "Sou administrador" e informando a chave; na página **Usuários** ele cria e remove usuários comuns. Sessão de 12 h; 5 erros seguidos bloqueiam o IP por 5 minutos. Atrás de HTTPS (proxy), o cookie passa a ser `Secure` automaticamente.
+O administrador entra marcando "Sou administrador" e informando a chave; na página **Usuários** ele cria e remove usuários comuns. Sessão de 12 h; não há limite de tentativas de login. Atrás de HTTPS (proxy), o cookie passa a ser `Secure` automaticamente.
 
 ## PM2 (manter no ar)
 ```

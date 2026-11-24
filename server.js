@@ -17,15 +17,11 @@ app.use(express.json({ limit: '10kb' }));
 app.get('/login.html', (req, res) => res.sendFile(path.join(PUB, 'login.html')));
 
 app.post('/api/login', (req, res) => {
-  const ip = req.ip;
-  if (auth.bloqueado(ip)) return res.status(429).json({ erro: 'Muitas tentativas. Aguarde alguns minutos.' });
   const { usuario, senha, chave } = req.body || {};
   const u = auth.verificar(usuario, senha, chave);
   if (!u) {
-    auth.registrarFalha(ip);
     return res.status(401).json({ erro: 'Usuário, senha ou chave incorretos.' });
   }
-  auth.limparFalhas(ip);
   auth.iniciarSessao(req, res, u);
   res.json({ ok: true });
 });
