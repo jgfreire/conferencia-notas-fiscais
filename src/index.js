@@ -4,12 +4,19 @@ const { lerDominio, lerAutomais } = require('./readers');
 const { conferir, conferenciaManual } = require('./engine');
 const { gerarRelatorio } = require('./report');
 
+const ESPECIES_PERMITIDAS = ['36', '39'];
+
 function carregarConfig(override = {}) {
   const base = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'config.json'), 'utf8'));
   const cfg = { ...base };
   for (const k of ['similaridadeMinima', 'similaridadeRevisao', 'toleranciaValor', 'diasMaximosEntreEmissaoEEntrada']) {
     const v = override[k];
     if (v !== undefined && v !== '' && !Number.isNaN(Number(v))) cfg[k] = Number(v);
+  }
+  // filtro de espécies: "36", "39" ou "36,39" (só aceita as permitidas)
+  if (override.especies !== undefined && override.especies !== '') {
+    const lista = String(override.especies).split(',').map((s) => s.trim()).filter((s) => ESPECIES_PERMITIDAS.includes(s));
+    if (lista.length) cfg.especiesConferidas = lista;
   }
   return cfg;
 }

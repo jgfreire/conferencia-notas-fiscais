@@ -6,6 +6,7 @@
   "diasMaximosEntreEmissaoEEntrada": 30,
   "equivalenciaEspecieModelo": {
     "36": "55",
+    "39": "55",
     "55": "55",
     "65": "65",
     "NFE": "55",

@@ -44,6 +44,12 @@
     <input type="file" id="dominio" name="dominio" accept=".xlsx,.xls,.csv" required>
     <label for="automais">Planilha do Automais</label>
     <input type="file" id="automais" name="automais" accept=".xlsx,.xls,.csv" required>
+    <label for="especies">Espécie a analisar</label>
+    <select id="especies" name="especies">
+      <option value="36">36</option>
+      <option value="39">39</option>
+      <option value="36,39">36 e 39</option>
+    </select>
     <details>
       <summary>Parâmetros</summary>
       <div class="grid">
@@ -68,6 +74,8 @@ fetch('/api/me').then((r) => r.json()).then((m) => {
 const f = document.getElementById('f'), out = document.getElementById('out'), go = document.getElementById('go');
 fetch('/api/config').then(r => r.json()).then(c => {
   for (const k of ['similaridadeMinima','similaridadeRevisao','toleranciaValor','diasMaximosEntreEmissaoEEntrada']) f.elements[k].value = c[k];
+  const e = (c.especiesConferidas || ['36']).join(',');
+  if ([...f.elements.especies.options].some((o) => o.value === e)) f.elements.especies.value = e;
 });
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
 const brl = (v) => (v === null || v === undefined ? '' : Number(v).toLocaleString('pt-BR', { style:'currency', currency:'BRL' }));
