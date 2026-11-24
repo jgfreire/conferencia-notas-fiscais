@@ -1,0 +1,10 @@
+[
+  {
+    "usuario": "João Gabriel Freire",
+    "salt": "f8fb01ade405ab2d5c57f1e9e36ad08c",
+    "hash": "eed2dcc238e306da8742546af0a752977db021570f1f1ab74358735d91b7db02ea986aee23f22575a742a12b05d4fca1ca5ed8bfbc975d32abe3a1ab833ddc3f",
+    "admin": true,
+    "chaveSalt": "736671842dc35f16dca87e21492146dc",
+    "chaveHash": "caa8b1027b5740dca3b58e900b08e3ea887e7de68cc9d257740f30ffc05fa32cf460bf96055482fa575323e2cc799e8c2b916ff9a42c77dbbd64f59ef3d5f022"
+  }
+]
