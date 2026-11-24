@@ -41,7 +41,7 @@ O administrador entra marcando "Sou administrador" e informando a chave; na pág
 ## PM2 (manter no ar)
 ```
 npm install -g pm2
-pm2 start ecosystem.config.js     # porta em env.PORT do arquivo (padrão 3200)
+pm2 start ecosystem.config.js     # a porta é definida pelo servidor (variável PORT); o sistema não fixa nenhuma
 pm2 save                          # guarda a lista para restaurar
 pm2 status                        # ver estado e reiniciar: pm2 restart conferencia-nf
 pm2 logs conferencia-nf           # ver mensagens/erros
